@@ -17,4 +17,8 @@ Route::get('/', function () {
 
 Auth::routes();
 
-Route::get('/home', 'HomeController@index')->name('home');
+Route::get('/expenses', 'ExpenseController@index')->name('expenses');
+Route::get('/api/expenses', 'ExpenseController@getExpenses');
+
+Route::get('/categories', 'CategoryController@index')->name('expense_cats');
+Route::get('/api/categories', 'CategoryController@getCategories');
