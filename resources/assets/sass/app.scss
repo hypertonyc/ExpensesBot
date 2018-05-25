@@ -8,7 +8,18 @@
 // Bootstrap
 @import '~bootstrap/scss/bootstrap';
 
+// Toastr
+@import "node_modules/toastr/toastr.scss";
+
 .navbar-laravel {
   background-color: #fff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+.section-block {
+  margin: 0 6px 24px 6px;
+}
+
+.section-block:last-child {
+  margin: 0 6px;
 }

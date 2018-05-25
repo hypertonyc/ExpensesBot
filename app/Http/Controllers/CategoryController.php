@@ -34,4 +34,16 @@ class CategoryController extends Controller
     $categories = ExpenseCategory::orderBy('position')->get();
     return response()->json(['categories' => $categories]);
   }
+
+  public function createCategories(Request $request)
+  {
+    $category_name = $request->input('newcat');
+
+    $category = new ExpenseCategory;
+    $category->name = $request->name;
+    $category->position = $request->position;
+    $category->save();
+
+    return response()->json(['id' => $category->id]);
+  }
 }

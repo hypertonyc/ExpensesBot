@@ -22,3 +22,4 @@ Route::get('/api/expenses', 'ExpenseController@getExpenses');
 
 Route::get('/categories', 'CategoryController@index')->name('expense_cats');
 Route::get('/api/categories', 'CategoryController@getCategories');
+Route::get('/api/categories/create', 'CategoryController@createCategories');
