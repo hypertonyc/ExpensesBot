@@ -14,7 +14,7 @@ class AddChatIdToUsersTable extends Migration
     public function up()
     {
       Schema::table('users', function (Blueprint $table) {
-        $table->string('chat_id')->unique();
+        $table->string('chat_id')->nullable();
       });
     }
 
