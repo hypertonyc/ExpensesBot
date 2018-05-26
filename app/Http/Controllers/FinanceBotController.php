@@ -30,7 +30,7 @@ class FinanceBotController extends Controller
 
   static function getCategoryId($position)
   {
-    $category = ExpenseCategory::where('position', $category_id - 1)->first();
+    $category = ExpenseCategory::where('position', $position - 1)->first();
     if(!$category) {
       return 1;
     } else {
