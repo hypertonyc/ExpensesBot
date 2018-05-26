@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Cache;
 
 class FinanceBotController extends Controller
 {
-  const $telegram_api_url = 'https://api.telegram.org/bot';
+  const TELEGRAM_API_URL = 'https://api.telegram.org/bot';
 
   function sendSuccessAmountMessage(User $user)
   {
@@ -26,7 +26,7 @@ class FinanceBotController extends Controller
 
     $client = new Client();
     $res = $client->request('POST',
-      $telegram_api_url . config('financebot.token') . '/sendMessage',
+      self::TELEGRAM_API_URL . config('financebot.token') . '/sendMessage',
       [
         'proxy' => [config('financebot.proxy')],
         'body' => $data
