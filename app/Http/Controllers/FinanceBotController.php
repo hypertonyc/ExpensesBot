@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\User;
+use App\ExpenseCategory;
+use App\Expense;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Promise;
@@ -16,9 +18,18 @@ class FinanceBotController extends Controller
 {
   const TELEGRAM_API_URL = 'https://api.telegram.org/bot';
 
-  static function sendSuccessAmountMessage(User $user)
+  static function checkCategory($category_id)
   {
-    $message_text = 'Так! Теперь выбери категорию:';
+    if($category_id == 0) {
+      return true;
+    } else {
+      $category = ExpenseCategory::find($category_id);
+      return !is_null($category);
+    }
+  }
+
+  static function sendMessage(User $user, String $message_text)
+  {
     $data = array(
       'chat_id' => $user->chat_id,
       'text' => $message_text,
@@ -32,35 +43,55 @@ class FinanceBotController extends Controller
         'form_params' => $data
       ]);
 
-		if ($res->getStatusCode() == 200)
-		{
+		if ($res->getStatusCode() == 200)	{
 			$result_data = json_decode((string) $res->getBody(), true);
-      if(!$result_data['ok'])
-      {
-          Log::error('Error while sending SuccessAmountMessage for user: ' . $user->name);
+      if(!$result_data['ok']) {
           Log::error($result_data);
       }
+    } else {
+      Log::error($res);
     }
+  }
+
+  static function sendSuccessAmountMessage(User $user)
+  {
+    $message_text = 'Так! Теперь выбери категорию:\r\n';
+    $categories = ExpenseCategory::orderBy('position')->get();
+    foreach ($categories as $category) {
+      $message_text = $message_text . $category->position . ' - ' . $category->name . '\r\n';
+    }
+    $message_text = $message_text . '0 - для отмены.\r\n';
+    self::sendMessage($user, $message_text);
   }
 
   static function sendFailedAmountMessage(User $user)
   {
-
+    $message_text = 'Ёпта, просто сумма расходов цифрами и всё!';    
   }
 
   static function sendSuccessCategoryMessage(User $user)
   {
-
+    $message_text = 'Окай! Если нужен комментарий, пиши. Если не нужен отправь 0.';
+    self::sendMessage($user, $message_text);
   }
 
   static function sendFailedCategoryMessage(User $user)
   {
-
+    $message_text = 'Ёпта, просто цифру отправь!';
+    self::sendMessage($user, $message_text);
+    self::sendSuccessAmountMessage($user);
   }
 
-  static function saveExpense(User $user)
+  static function sendSuccessSavingMessage(User $user)
   {
+    $message_text = 'Сохранил. Все молодцы!';
+    self::sendMessage($user, $message_text);
+  }
 
+  static function sendSuccessResetMessage(User $user)
+  {
+    $message_text = 'Отменил! Ну ты пиши если чо...';
+    self::sendMessage($user, $message_text);
   }
 
   static function processUserMessage(User $user, String $text)
@@ -80,17 +111,38 @@ class FinanceBotController extends Controller
         break;
 
       case 1:
-        if(intval($text) > 0) {
-          Cache::forever($cache_key . '_category', intval($text));
-          self::sendSuccessCategoryMessage($user);
-          Cache::forever($cache_key, 2);
+        if(is_int($text) && self::checkCategory(intval($text))) {
+          if(intval($text) == 0) {
+              Cache::forever($cache_key, 0);
+              self::sendSuccessResetMessage($user);
+          } else {
+            Cache::forever($cache_key . '_category', intval($text));
+            self::sendSuccessCategoryMessage($user);
+            Cache::forever($cache_key, 2);
+          }
         } else {
           self::sendFailedCategoryMessage($user);
         }
         break;
 
       case 2:
-        self::saveExpense($user);
+        $description = trim(substr($text, 0, 200));
+
+        if($description == '0') {
+          $description = '';
+        }
+
+        /***/
+        $expense = new Expense;
+        $expense->user_id = $user->id;
+        $expense->category_id = Cache::get($cache_key . '_category', 1);
+        $expense->amount = Cache::get($cache_key . '_amount', 0);
+        if(!empty($description)) {
+          $expense->description = $description;
+        }
+        $expense->save();
+        /***/
+        self::sendSuccessSavingMessage($user);
         Cache::forever($cache_key, 0);
         break;
 
