@@ -61,12 +61,12 @@ class FinanceBotController extends Controller
       $message_text = $message_text . $category->position . ' - ' . $category->name . '\r\n';
     }
     $message_text = $message_text . '0 - для отмены.\r\n';
-    self::sendMessage($user, $message_text);
+    self::sendMessage($user, urlencode($message_text));
   }
 
   static function sendFailedAmountMessage(User $user)
   {
-    $message_text = 'Ёпта, просто сумма расходов цифрами и всё!';    
+    $message_text = 'Ёпта, просто сумма расходов цифрами и всё!';
   }
 
   static function sendSuccessCategoryMessage(User $user)
@@ -111,7 +111,7 @@ class FinanceBotController extends Controller
         break;
 
       case 1:
-        if(is_int($text) && self::checkCategory(intval($text))) {
+        if(is_numeric($text) && self::checkCategory(intval($text))) {
           if(intval($text) == 0) {
               Cache::forever($cache_key, 0);
               self::sendSuccessResetMessage($user);
