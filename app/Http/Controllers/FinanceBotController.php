@@ -16,9 +16,9 @@ class FinanceBotController extends Controller
 {
   const TELEGRAM_API_URL = 'https://api.telegram.org/bot';
 
-  function sendSuccessAmountMessage(User $user)
+  static function sendSuccessAmountMessage(User $user)
   {
-    $message_text = 'Так! Теперь выбери категорию:'
+    $message_text = 'Так! Теперь выбери категорию:';
     $data = array(
       'chat_id' => $user->chat_id,
       'text' => $message_text,
@@ -29,7 +29,7 @@ class FinanceBotController extends Controller
       self::TELEGRAM_API_URL . config('financebot.token') . '/sendMessage',
       [
         'proxy' => [config('financebot.proxy')],
-        'body' => $data
+        'form_params' => $data
       ]);
 
 		if ($res->getStatusCode() == 200)
@@ -43,27 +43,27 @@ class FinanceBotController extends Controller
     }
   }
 
-  function sendFailedAmountMessage(User $user)
+  static function sendFailedAmountMessage(User $user)
   {
 
   }
 
-  function sendSuccessCategoryMessage(User $user)
+  static function sendSuccessCategoryMessage(User $user)
   {
 
   }
 
-  function sendFailedCategoryMessage(User $user)
+  static function sendFailedCategoryMessage(User $user)
   {
 
   }
 
-  function saveExpense(User $user)
+  static function saveExpense(User $user)
   {
 
   }
 
-  function processUserMessage(User $user, String $text)
+  static function processUserMessage(User $user, String $text)
   {
     $cache_key = 'financebot_' . $user->id;
     $chat_step = Cache::get($cache_key, 0);
@@ -72,25 +72,25 @@ class FinanceBotController extends Controller
       case 0:
         if(is_numeric($text)) {
           Cache::forever($cache_key . '_amount', round(floatval($text), 2));
-          sendSuccessAmountMessage($user);
+          self::sendSuccessAmountMessage($user);
           Cache::forever($cache_key, 1);
         } else {
-          sendFailedAmountMessage($user);
+          self::sendFailedAmountMessage($user);
         }
         break;
 
       case 1:
         if(intval($text) > 0) {
           Cache::forever($cache_key . '_category', intval($text));
-          sendSuccessCategoryMessage($user);
+          self::sendSuccessCategoryMessage($user);
           Cache::forever($cache_key, 2);
         } else {
-          sendFailedCategoryMessage($user);
+          self::sendFailedCategoryMessage($user);
         }
         break;
 
       case 2:
-        saveExpense($user);
+        self::saveExpense($user);
         Cache::forever($cache_key, 0);
         break;
 
@@ -122,7 +122,7 @@ class FinanceBotController extends Controller
         Log::error('Unknown telegram user_id: ' . $user_id);
       }
       else {
-        processUserMessage($user, $text);
+        self::processUserMessage($user, $text);
       }
     }
   }
