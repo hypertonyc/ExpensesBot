@@ -28,6 +28,17 @@ class FinanceBotController extends Controller
     }
   }
 
+  static function getCategoryId($position)
+  {
+    $category = ExpenseCategory::where('position', $category_id - 1)->first();
+    if(!$category) {
+      return 1;
+    } else {
+      return $category->id;
+    }
+
+  }
+
   static function sendMessage(User $user, String $message_text)
   {
     $data = array(
@@ -58,7 +69,7 @@ class FinanceBotController extends Controller
     $message_text = "Так! Теперь выбери категорию:\r\n";
     $categories = ExpenseCategory::orderBy('position')->get();
     foreach ($categories as $category) {
-      $message_text = $message_text . $category->position . " - " . $category->name . "\r\n";
+      $message_text = $message_text . ($category->position + 1) . " - " . $category->name . "\r\n";
     }
     $message_text = $message_text . "0 - для отмены.\r\n";
     self::sendMessage($user, $message_text);
@@ -116,7 +127,7 @@ class FinanceBotController extends Controller
               Cache::forever($cache_key, 0);
               self::sendSuccessResetMessage($user);
           } else {
-            Cache::forever($cache_key . '_category', intval($text));
+            Cache::forever($cache_key . '_category', self::getCategoryId(intval($text)));
             self::sendSuccessCategoryMessage($user);
             Cache::forever($cache_key, 2);
           }
