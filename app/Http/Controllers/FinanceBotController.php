@@ -32,7 +32,8 @@ class FinanceBotController extends Controller
   {
     $data = array(
       'chat_id' => $user->chat_id,
-      'text' => $message_text,
+      'text' => urlencode($message_text),
+      'parse_mode' => 'HTML'
     );
 
     $client = new Client();
@@ -61,7 +62,7 @@ class FinanceBotController extends Controller
       $message_text = $message_text . $category->position . ' - ' . $category->name . '\r\n';
     }
     $message_text = $message_text . '0 - для отмены.\r\n';
-    self::sendMessage($user, urlencode($message_text));
+    self::sendMessage($user, $message_text);
   }
 
   static function sendFailedAmountMessage(User $user)
