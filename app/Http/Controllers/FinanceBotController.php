@@ -32,8 +32,7 @@ class FinanceBotController extends Controller
   {
     $data = array(
       'chat_id' => $user->chat_id,
-      'text' => urlencode($message_text),
-      'parse_mode' => 'HTML'
+      'text' => $message_text,
     );
 
     $client = new Client();
@@ -56,12 +55,12 @@ class FinanceBotController extends Controller
 
   static function sendSuccessAmountMessage(User $user)
   {
-    $message_text = 'Так! Теперь выбери категорию:\r\n';
+    $message_text = "Так! Теперь выбери категорию:\r\n";
     $categories = ExpenseCategory::orderBy('position')->get();
     foreach ($categories as $category) {
-      $message_text = $message_text . $category->position . ' - ' . $category->name . '\r\n';
+      $message_text = $message_text . $category->position . " - " . $category->name . "\r\n";
     }
-    $message_text = $message_text . '0 - для отмены.\r\n';
+    $message_text = $message_text . "0 - для отмены.\r\n";
     self::sendMessage($user, $message_text);
   }
 
