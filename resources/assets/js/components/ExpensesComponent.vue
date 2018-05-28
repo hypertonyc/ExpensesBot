@@ -7,7 +7,13 @@
 
                   <div class="card-body">
                     <div class="section-block">
-                      <h4>Список категорий</h4>
+                      <h4>Таблица расходов</h4>
+                      <nav class="nav">
+                        <a class="nav-link" href="#" v-bind:class="{ active: (period == '') }" v-on:click.prevent="setToday()">Сегодня</a>
+                        <a class="nav-link" href="#" v-bind:class="{ active: (period == 'week') }" v-on:click.prevent="setWeek()">С начала недели</a>
+                        <a class="nav-link" href="#" v-bind:class="{ active: (period == 'month') }" v-on:click.prevent="setMonth()">С начала месяца</a>
+                        <a class="nav-link" href="#" v-bind:class="{ active: (period == 'month') }" v-on:click.prevent="setPeriod()">За период</a>
+                      </nav>
                       <p v-if="expenses.length == 0">Нет ни одного расхода</p>
 
                       <table v-else class="table table-striped">
@@ -32,6 +38,7 @@
                           </tr>
                         </tbody>
                       </table>
+                      <p class="total">Итого: {{total}}</p>
                     </div>
                   </div>
               </div>
@@ -46,19 +53,43 @@
 
     data() {
       return {
+        period: '',
         expenses: []
       }
     },
 
     methods: {
       getExpenses() {
-        axios.get('/api/expenses')
+        axios.get('/api/expenses/' + this.period)
         .then(response => {
           this.expenses = response.data.expenses;
         })
         .catch(e => {
            toastr.error(e, 'Произошла ошибка', {timeout:5000});
         })
+      },
+      setToday() {
+        this.period = '';
+        this.getExpenses();
+      },
+      setWeek() {
+        this.period = 'week';
+        this.getExpenses();
+      },
+      setMonth() {
+        this.period = 'month';
+        this.getExpenses();
+      },
+      setPeriod() {
+        this.period = 'month';
+        this.getExpenses();
+      }
+    },
+
+    computed : {
+      total: function() {
+        let sum = 0;
+        return this.expenses.reduce((sum, item) => sum + item.amount, 0);
       }
     },
 

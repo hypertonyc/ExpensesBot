@@ -1,6 +1,6 @@
 
 // Fonts
-@import url("https://fonts.googleapis.com/css?family=Raleway:300,400,600");
+@import url('https://fonts.googleapis.com/css?family=Roboto:400,400i,700&subset=cyrillic');
 
 // Variables
 @import "variables";
@@ -22,4 +22,14 @@
 
 .section-block:last-child {
   margin: 0 6px;
+}
+
+p.total {
+  font-size: 12pt;
+  font-weight: 700;
+}
+
+.nav-link.active {
+  font-weight: 700;
+  text-decoration: underline;
 }

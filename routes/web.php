@@ -18,7 +18,9 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/expenses', 'ExpenseController@index')->name('expenses');
-Route::get('/api/expenses', 'ExpenseController@getExpenses');
+Route::get('/api/expenses', 'ExpenseController@getTodayExpenses');
+Route::get('/api/expenses/week', 'ExpenseController@getWeekExpenses');
+Route::get('/api/expenses/month', 'ExpenseController@getMonthExpenses');
 
 Route::get('/categories', 'CategoryController@index')->name('expense_cats');
 Route::get('/api/categories', 'CategoryController@getCategories');

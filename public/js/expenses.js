@@ -47842,11 +47842,19 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
+      period: '',
       expenses: []
     };
   },
@@ -47856,11 +47864,36 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     getExpenses: function getExpenses() {
       var _this = this;
 
-      __WEBPACK_IMPORTED_MODULE_0_axios___default.a.get('/api/expenses').then(function (response) {
+      __WEBPACK_IMPORTED_MODULE_0_axios___default.a.get('/api/expenses/' + this.period).then(function (response) {
         _this.expenses = response.data.expenses;
       }).catch(function (e) {
         toastr.error(e, 'Произошла ошибка', { timeout: 5000 });
       });
+    },
+    setToday: function setToday() {
+      this.period = '';
+      this.getExpenses();
+    },
+    setWeek: function setWeek() {
+      this.period = 'week';
+      this.getExpenses();
+    },
+    setMonth: function setMonth() {
+      this.period = 'month';
+      this.getExpenses();
+    },
+    setPeriod: function setPeriod() {
+      this.period = 'month';
+      this.getExpenses();
+    }
+  },
+
+  computed: {
+    total: function total() {
+      var sum = 0;
+      return this.expenses.reduce(function (sum, item) {
+        return sum + item.amount;
+      }, 0);
     }
   },
 
@@ -47885,7 +47918,73 @@ var render = function() {
           _vm._v(" "),
           _c("div", { staticClass: "card-body" }, [
             _c("div", { staticClass: "section-block" }, [
-              _c("h4", [_vm._v("Список категорий")]),
+              _c("h4", [_vm._v("Таблица расходов")]),
+              _vm._v(" "),
+              _c("nav", { staticClass: "nav" }, [
+                _c(
+                  "a",
+                  {
+                    staticClass: "nav-link",
+                    class: { active: _vm.period == "" },
+                    attrs: { href: "#" },
+                    on: {
+                      click: function($event) {
+                        $event.preventDefault()
+                        _vm.setToday()
+                      }
+                    }
+                  },
+                  [_vm._v("Сегодня")]
+                ),
+                _vm._v(" "),
+                _c(
+                  "a",
+                  {
+                    staticClass: "nav-link",
+                    class: { active: _vm.period == "week" },
+                    attrs: { href: "#" },
+                    on: {
+                      click: function($event) {
+                        $event.preventDefault()
+                        _vm.setWeek()
+                      }
+                    }
+                  },
+                  [_vm._v("С начала недели")]
+                ),
+                _vm._v(" "),
+                _c(
+                  "a",
+                  {
+                    staticClass: "nav-link",
+                    class: { active: _vm.period == "month" },
+                    attrs: { href: "#" },
+                    on: {
+                      click: function($event) {
+                        $event.preventDefault()
+                        _vm.setMonth()
+                      }
+                    }
+                  },
+                  [_vm._v("С начала месяца")]
+                ),
+                _vm._v(" "),
+                _c(
+                  "a",
+                  {
+                    staticClass: "nav-link",
+                    class: { active: _vm.period == "month" },
+                    attrs: { href: "#" },
+                    on: {
+                      click: function($event) {
+                        $event.preventDefault()
+                        _vm.setPeriod()
+                      }
+                    }
+                  },
+                  [_vm._v("За период")]
+                )
+              ]),
               _vm._v(" "),
               _vm.expenses.length == 0
                 ? _c("p", [_vm._v("Нет ни одного расхода")])
@@ -47910,7 +48009,11 @@ var render = function() {
                         ])
                       })
                     )
-                  ])
+                  ]),
+              _vm._v(" "),
+              _c("p", { staticClass: "total" }, [
+                _vm._v("Итого: " + _vm._s(_vm.total))
+              ])
             ])
           ])
         ])

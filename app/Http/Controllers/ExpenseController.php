@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Expense;
 
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class ExpenseController extends Controller
 {
@@ -28,9 +29,23 @@ class ExpenseController extends Controller
       return view('expenses');
   }
 
-  public function getExpenses()
+  public function getTodayExpenses()
   {
-    $expenses = Expense::with(['category', 'user'])->orderBy('created_at')->get();
+    $expenses = Expense::with(['category', 'user'])->where('created_at','>=', Carbon::today())->orderBy('created_at')->get();
+    return response()->json(['expenses' => $expenses]);
+  }
+
+  public function getWeekExpenses()
+  {
+    $dt = Carbon::now();
+    $expenses = Expense::with(['category', 'user'])->where('created_at','>=', $dt->StartOfWeek())->orderBy('created_at')->get();
+    return response()->json(['expenses' => $expenses]);
+  }
+
+  public function getMonthExpenses()
+  {
+    $dt = Carbon::now();
+    $expenses = Expense::with(['category', 'user'])->where('created_at','>=', $dt->StartOfMonth())->orderBy('created_at')->get();
     return response()->json(['expenses' => $expenses]);
   }
 }
