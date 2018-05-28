@@ -30,7 +30,7 @@ class ExpenseController extends Controller
 
   public function getExpenses()
   {
-    $expenses = Expense::orderBy('created_at')->get();
+    $expenses = Expense::with(['category', 'user'])->orderBy('created_at')->get();
     return response()->json(['expenses' => $expenses]);
   }
 }
