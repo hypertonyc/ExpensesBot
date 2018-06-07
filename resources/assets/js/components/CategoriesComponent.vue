@@ -29,7 +29,7 @@
   </div>
 </template>
 
-<script>  
+<script>
   export default {
 
     data() {
@@ -41,29 +41,33 @@
 
     methods: {
       getCategories() {
+        var _self = this;
+
         axios.get('/api/categories')
         .then(response => {
-          this.categories = response.data.categories;
+          _self.categories = response.data.categories;
         })
         .catch(e => {
            toastr.error(e, 'Произошла ошибка', {timeout:5000});
         })
       },
       addCategory() {
+        var _self = this;
+
         axios.get('/api/categories/create', {
           params:{
-            name: this.newCategoryName,
-            position: this.categories.length
+            name: _self.newCategoryName,
+            position: _self.categories.length
           }
         })
         .then(response => {
-          this.categories.push({
+          _self.categories.push({
             id: response.data.id,
-            name: this.newCategoryName,
-            position: this.categories.length
+            name: _self.newCategoryName,
+            position: _self.categories.length
           });
           toastr.success('Категория "' + this.newCategoryName + '" успешно добавлена', 'Добавлена новая категория', {timeout:5000});
-          this.newCategoryName = '';
+          _self.newCategoryName = '';
         })
         .catch(e => {
           toastr.error(e, 'Произошла ошибка', {timeout:5000});
@@ -72,7 +76,7 @@
     },
 
     mounted() {
-        this.getCategories();
+      this.getCategories();
     }
   }
 </script>

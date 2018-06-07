@@ -83,6 +83,8 @@
 
     methods: {
       getExpenses() {
+        var _self = this;
+
         this.loading = true;
 
         var expensesUrl = '/api/expenses/' + this.period;
@@ -92,13 +94,13 @@
 
         axios.get(expensesUrl)
         .then(response => {
-          this.expenses = response.data.expenses;
+          _self.expenses = response.data.expenses;
         })
         .catch(e => {
           toastr.error(e, 'Произошла ошибка', {timeout:5000});
         })
         .then(() => {
-          this.loading = false;
+          _self.loading = false;
         });
       },
       setToday() {
@@ -132,7 +134,7 @@
       datePicker
     },
 
-    created() {
+    mounted() {
       this.periodFrom.setHours(0,0,0,0);
       this.periodTo.setHours(23,59,59,999);
 
