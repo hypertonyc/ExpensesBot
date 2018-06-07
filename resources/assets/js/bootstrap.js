@@ -20,6 +20,7 @@ try {
  * CSRF token as a header based on the value of the "XSRF" token cookie.
  */
 
+window.moment = require('moment');
 window.toastr = require('toastr');
 window.axios = require('axios');
 window.chartjs = require('chart.js');

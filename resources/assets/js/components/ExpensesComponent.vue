@@ -12,37 +12,49 @@
                         <a class="nav-link" href="#" v-bind:class="{ active: (period == '') }" v-on:click.prevent="setToday()">Сегодня</a>
                         <a class="nav-link" href="#" v-bind:class="{ active: (period == 'week') }" v-on:click.prevent="setWeek()">С начала недели</a>
                         <a class="nav-link" href="#" v-bind:class="{ active: (period == 'month') }" v-on:click.prevent="setMonth()">С начала месяца</a>
-                        <a class="nav-link" href="#" v-bind:class="{ active: (period == 'month') }" v-on:click.prevent="setPeriod()">За период</a>
+                        <a class="nav-link" href="#" v-bind:class="{ active: (period == 'period') }" v-on:click.prevent="setPeriod()">За период</a>
                       </nav>
-                      <!--
-                      <div>
-                        <canvas id="expansesChart" width="400" height="400"></canvas>
+                      <div class="section-block">
+                        <div class="container" v-show="period == 'period'">
+                          <div class="row">
+                            <div class="form-group col-sm-4">
+                              <label>С:</label>
+                              <date-picker v-model="periodFrom" :config="dtOptions"></date-picker>
+                            </div>
+                            <div class="form-group col-sm-4">
+                              <label>По:</label>
+                              <date-picker v-model="periodTo" :config="dtOptions"></date-picker>
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                      -->
-                      <p v-if="expenses.length == 0">Нет ни одного расхода</p>
-                      <table v-else class="table table-striped">
-                        <thead>
-                          <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">Дата и время</th>
-                            <th scope="col">Категория</th>
-                            <th scope="col">Сумма</th>
-                            <th scope="col">Комментарий</th>
-                            <th scope="col">Пользователь</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr v-for="(expense, index) in expenses">
-                            <td>{{index + 1}}</td>
-                            <td>{{expense.created_at}}</td>
-                            <td>{{expense.category.name}}</td>
-                            <td>{{expense.amount}}</td>
-                            <td>{{expense.description}}</td>
-                            <td>{{expense.user.name}}</td>
-                          </tr>
-                        </tbody>
-                      </table>
-                      <p class="total">Итого: {{total}}</p>
+                      <p v-if="loading" class="text-center">Загрузка...</p>
+                      <div v-else class="section-block">
+                        <p v-if="expenses.length == 0"  class="text-center">Нет ни одного расхода</p>
+                        <table v-else class="table table-striped">
+                          <thead>
+                            <tr>
+                              <th scope="col">#</th>
+                              <th scope="col">Дата и время</th>
+                              <th scope="col">Категория</th>
+                              <th scope="col">Сумма</th>
+                              <th scope="col">Комментарий</th>
+                              <th scope="col">Пользователь</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr v-for="(expense, index) in expenses">
+                              <td>{{index + 1}}</td>
+                              <td>{{expense.created_at}}</td>
+                              <td>{{expense.category.name}}</td>
+                              <td>{{expense.amount}}</td>
+                              <td>{{expense.description}}</td>
+                              <td>{{expense.user.name}}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                        <p class="total">Итого: {{total}}</p>
+                      </div>
                     </div>
                   </div>
               </div>
@@ -53,56 +65,65 @@
 
 <script>
   import axios from 'axios';
+  import datePicker from 'vue-bootstrap-datetimepicker';
+  import 'pc-bootstrap4-datetimepicker/build/css/bootstrap-datetimepicker.css';
+
   export default {
 
     data() {
       return {
+        loading: true,
         myDoughnutChart: null,
         period: '',
+        periodFrom: new Date(),
+        periodTo: new Date(),
+        dtOptions: {locale: 'ru'},
         expenses: []
       }
     },
 
     methods: {
       getExpenses() {
-        axios.get('/api/expenses/' + this.period)
+        this.loading = true;
+
+        var expensesUrl = '/api/expenses/' + this.period;
+        if (this.period == 'period') {
+          expensesUrl += '/' + moment(this.periodFrom).unix() + '/' + moment(this.periodTo).unix();
+        }
+
+        axios.get(expensesUrl)
         .then(response => {
           this.expenses = response.data.expenses;
-
-          // var data = {
-          //   datasets: [{
-          //     data: this.expenses.map(function(e){return e.amount})
-          //   }]
-          // };
-          // this.myDoughnutChart = new Chart($('#expansesChart'), {
-          //   type: 'doughnut',
-          //   data: data,
-          //   options: {}
-          // });
         })
         .catch(e => {
           toastr.error(e, 'Произошла ошибка', {timeout:5000});
+        })
+        .then(() => {
+          this.loading = false;
         });
       },
       setToday() {
         this.period = '';
+        this.addPeriod = '';
         this.getExpenses();
       },
       setWeek() {
         this.period = 'week';
+        this.addPeriod = '';
         this.getExpenses();
       },
       setMonth() {
         this.period = 'month';
+        this.addPeriod = '';
         this.getExpenses();
       },
       setPeriod() {
-        this.period = 'month';
+        this.period = 'period';
         this.getExpenses();
       }
     },
 
-    computed : {
+    computed: {
       total: function() {
         var sum = 0;
         return this.expenses.reduce(function(sum, item) {
@@ -111,7 +132,14 @@
       }
     },
 
-    mounted() {
+    components: {
+      datePicker
+    },
+
+    created() {
+      this.periodFrom.setHours(0,0,0,0);
+      this.periodTo.setHours(23,59,59,999);
+
       this.getExpenses();
     }
   }

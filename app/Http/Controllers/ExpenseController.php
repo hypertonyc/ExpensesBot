@@ -48,4 +48,14 @@ class ExpenseController extends Controller
     $expenses = Expense::with(['category', 'user'])->where('created_at','>=', $dt->StartOfMonth())->orderBy('created_at')->get();
     return response()->json(['expenses' => $expenses]);
   }
+
+  public function getPeriodExpenses($from_dt, $to_dt)
+  {
+    $from_date = Carbon::createFromTimestamp($from_dt);
+    $to_date = Carbon::createFromTimestamp($to_dt);
+
+    $expenses = Expense::with(['category', 'user'])->where('created_at','>=', $from_date)->where('created_at','<=', $to_date)->orderBy('created_at')->get();
+
+    return response()->json(['expenses' => $expenses]);
+  }
 }

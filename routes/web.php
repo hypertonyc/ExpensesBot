@@ -21,6 +21,7 @@ Route::get('/expenses', 'ExpenseController@index')->name('expenses');
 Route::get('/api/expenses', 'ExpenseController@getTodayExpenses');
 Route::get('/api/expenses/week', 'ExpenseController@getWeekExpenses');
 Route::get('/api/expenses/month', 'ExpenseController@getMonthExpenses');
+Route::get('/api/expenses/period/{from}/{to}', 'ExpenseController@getPeriodExpenses');
 
 Route::get('/categories', 'CategoryController@index')->name('expense_cats');
 Route::get('/api/categories', 'CategoryController@getCategories');
