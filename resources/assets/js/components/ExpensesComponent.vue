@@ -9,7 +9,7 @@
                     <div class="section-block">
                       <h4>Таблица расходов</h4>
                       <nav class="nav">
-                        <a class="nav-link" href="#" v-bind:class="{ active: (period == '') }" v-on:click.prevent="setToday()">Сегодня</a>
+                        <a class="nav-link" href="#" v-bind:class="{ active: (period == 'today') }" v-on:click.prevent="setToday()">Сегодня</a>
                         <a class="nav-link" href="#" v-bind:class="{ active: (period == 'week') }" v-on:click.prevent="setWeek()">С начала недели</a>
                         <a class="nav-link" href="#" v-bind:class="{ active: (period == 'month') }" v-on:click.prevent="setMonth()">С начала месяца</a>
                         <a class="nav-link" href="#" v-bind:class="{ active: (period == 'period') }" v-on:click.prevent="setPeriod()">За период</a>
@@ -74,7 +74,7 @@
       return {
         loading: true,
         myDoughnutChart: null,
-        period: '',
+        period: 'today',
         periodFrom: new Date(),
         periodTo: new Date(),
         dtOptions: {locale: 'ru'},
@@ -103,18 +103,15 @@
         });
       },
       setToday() {
-        this.period = '';
-        this.addPeriod = '';
+        this.period = 'today';
         this.getExpenses();
       },
       setWeek() {
         this.period = 'week';
-        this.addPeriod = '';
         this.getExpenses();
       },
       setMonth() {
         this.period = 'month';
-        this.addPeriod = '';
         this.getExpenses();
       },
       setPeriod() {
