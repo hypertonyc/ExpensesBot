@@ -33,7 +33,7 @@ class ExpenseController extends Controller
 
   public function getTodayExpenses()
   {
-    Log::debug('getTodayExpenses');
+    // Log::debug('getTodayExpenses');
 
     $expenses = Expense::with(['category', 'user'])->where('created_at','>=', Carbon::today())->orderBy('created_at')->get();
     return response()->json(['expenses' => $expenses]);
@@ -41,7 +41,7 @@ class ExpenseController extends Controller
 
   public function getWeekExpenses()
   {
-    Log::debug('getWeekExpenses');
+    // Log::debug('getWeekExpenses');
 
     $dt = Carbon::now();
     $expenses = Expense::with(['category', 'user'])->where('created_at','>=', $dt->StartOfWeek())->orderBy('created_at')->get();
@@ -50,7 +50,7 @@ class ExpenseController extends Controller
 
   public function getMonthExpenses()
   {
-    Log::debug('getMonthExpenses');
+    // Log::debug('getMonthExpenses');
 
     $dt = Carbon::now();
     $expenses = Expense::with(['category', 'user'])->where('created_at','>=', $dt->StartOfMonth())->orderBy('created_at')->get();
@@ -59,7 +59,7 @@ class ExpenseController extends Controller
 
   public function getPeriodExpenses($from_dt, $to_dt)
   {
-    Log::debug('getPeriodExpenses');
+    // Log::debug('getPeriodExpenses');
 
     $from_date = Carbon::createFromTimestamp($from_dt);
     $to_date = Carbon::createFromTimestamp($to_dt);

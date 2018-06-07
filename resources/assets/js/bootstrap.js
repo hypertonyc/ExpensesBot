@@ -19,10 +19,10 @@ try {
  * to our Laravel back-end. This library automatically handles sending the
  * CSRF token as a header based on the value of the "XSRF" token cookie.
  */
-
+require('es6-promise').polyfill();
+window.axios = require('axios');
 window.moment = require('moment');
 window.toastr = require('toastr');
-window.axios = require('axios');
 window.chartjs = require('chart.js');
 
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';

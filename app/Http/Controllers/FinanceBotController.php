@@ -169,8 +169,8 @@ class FinanceBotController extends Controller
     $update_array = $request->all();
 
     // Log this shit
-    Log::debug('New update');
-    Log::debug($update_array);
+    // Log::debug('New update');
+    // Log::debug($update_array);
     ////
 
     if(array_key_exists('message', $update_array))
