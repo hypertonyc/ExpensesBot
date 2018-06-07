@@ -123,10 +123,11 @@
 
     computed: {
       total: function() {
-        var sum = 0;
-        return this.expenses.reduce(function(sum, item) {
-          return sum + item.amount;
+        var tmp = 0;
+        var sum = this.expenses.reduce(function(sum, item) {
+          return tmp + item.amount;
         }, 0);
+        return sum.toFixed(2);
       }
     },
 
