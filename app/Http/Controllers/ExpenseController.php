@@ -33,39 +33,62 @@ class ExpenseController extends Controller
 
   public function getTodayExpenses()
   {
-    // Log::debug('getTodayExpenses');
-
     $expenses = Expense::with(['category', 'user'])->where('created_at','>=', Carbon::today())->orderBy('created_at')->get();
-    return response()->json(['expenses' => $expenses]);
+    $total_amount = $expenses->sum('amount');
+    $categories = collect();
+    $expenses->groupBy('category_id')->each(function($item, $key) use (&$categories, $total_amount) {
+      $amount = $item->sum('amount');
+      $categories->push(array('category' => $item[0]['category'], 'percent' => round($amount / $total_amount * 100),'amount' => round($amount, 2)));
+    });
+    $categories = $categories->sortByDesc('amount')->values()->all();
+
+    return response()->json(['expenses' => $expenses, 'categories' => $categories, 'total' => round($total_amount, 2)]);
   }
 
   public function getWeekExpenses()
   {
-    // Log::debug('getWeekExpenses');
-
     $dt = Carbon::now();
     $expenses = Expense::with(['category', 'user'])->where('created_at','>=', $dt->StartOfWeek())->orderBy('created_at')->get();
-    return response()->json(['expenses' => $expenses]);
+    $total_amount = $expenses->sum('amount');
+    $categories = collect();
+    $expenses->groupBy('category_id')->each(function($item, $key) use (&$categories, $total_amount) {
+      $amount = $item->sum('amount');
+      $categories->push(array('category' => $item[0]['category'], 'percent' => round($amount / $total_amount * 100),'amount' => round($amount, 2)));
+    });
+    $categories = $categories->sortByDesc('amount')->values()->all();
+
+    return response()->json(['expenses' => $expenses, 'categories' => $categories, 'total' => round($total_amount, 2)]);
   }
 
   public function getMonthExpenses()
   {
-    // Log::debug('getMonthExpenses');
-
     $dt = Carbon::now();
     $expenses = Expense::with(['category', 'user'])->where('created_at','>=', $dt->StartOfMonth())->orderBy('created_at')->get();
-    return response()->json(['expenses' => $expenses]);
+    $total_amount = $expenses->sum('amount');
+    $categories = collect();
+    $expenses->groupBy('category_id')->each(function($item, $key) use (&$categories, $total_amount) {
+      $amount = $item->sum('amount');
+      $categories->push(array('category' => $item[0]['category'], 'percent' => round($amount / $total_amount * 100),'amount' => round($amount, 2)));
+    });
+    $categories = $categories->sortByDesc('amount')->values()->all();
+
+    return response()->json(['expenses' => $expenses, 'categories' => $categories, 'total' => round($total_amount, 2)]);
   }
 
   public function getPeriodExpenses($from_dt, $to_dt)
   {
-    // Log::debug('getPeriodExpenses');
-
     $from_date = Carbon::createFromTimestamp($from_dt);
     $to_date = Carbon::createFromTimestamp($to_dt);
 
     $expenses = Expense::with(['category', 'user'])->where('created_at','>=', $from_date)->where('created_at','<=', $to_date)->orderBy('created_at')->get();
+    $total_amount = $expenses->sum('amount');
+    $categories = collect();
+    $expenses->groupBy('category_id')->each(function($item, $key) use (&$categories, $total_amount) {
+      $amount = $item->sum('amount');
+      $categories->push(array('category' => $item[0]['category'], 'percent' => round($amount / $total_amount * 100),'amount' => round($amount, 2)));
+    });
+    $categories = $categories->sortByDesc('amount')->values()->all();
 
-    return response()->json(['expenses' => $expenses]);
+    return response()->json(['expenses' => $expenses, 'categories' => $categories, 'total' => round($total_amount, 2)]);
   }
 }
